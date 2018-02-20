@@ -1,0 +1,220 @@
+{
+    "id": "526326FA-48A7-4257-A191-37A8F75345BE",
+    "name": "AzureAgentCreate",
+    "friendlyName": "Azure Build Agent Create",
+    "description": "Create a build/release agent in Azure based on an image",
+    "helpMarkDown": "[More Information] https://github.com/ZEisinger/vsts-tasks/blob/master/HELP.md",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "author": "Zachary Eisinger",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 0
+    },
+    "demands": [
+        "azureps"
+    ],
+    "minimumAgentVersion": "1.103.0",
+    "groups": [
+        {
+            "name": "output",
+            "displayName": "Output",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "ConnectedServiceNameSelector",
+            "aliases": ["azureConnectionType"],
+            "type": "pickList",
+            "label": "Azure Connection Type",
+            "required": false,
+            "helpMarkDown": "",
+            "defaultValue": "ConnectedServiceNameARM",
+            "options": {
+                "ConnectedServiceName": "Azure Classic",
+                "ConnectedServiceNameARM": "Azure Resource Manager"
+            }
+        },
+        {
+            "name": "ConnectedServiceName",
+            "aliases": ["azureClassicSubscription"],
+            "type": "connectedService:Azure",
+            "label": "Azure Classic Subscription",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Azure Classic subscription to target for copying the files.",
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceName"
+        },
+        {
+            "name": "ConnectedServiceNameARM",
+            "aliases": ["azureSubscription"],
+            "type": "connectedService:AzureRM",
+            "label": "Azure Subscription",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Azure Resource Manager subscription to target for copying the files.",
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM"
+        },
+        {
+            "name": "StorageAccount",
+            "aliases": ["classicStorage"],
+            "type": "pickList",
+            "label": "Classic Storage Account",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Specify a pre-existing classic storage account. It is also used as an intermediary for copying files to Azure VMs",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceName"
+        },
+        {
+            "name": "StorageAccountRM",
+            "aliases": ["storage"],
+            "type": "pickList",
+            "label": "RM Storage Account",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Specify a pre-existing ARM storage account. It is also used as an intermediary for copying files to Azure VMs",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM"
+        },
+        {
+            "name": "ContainerName",
+            "type": "string",
+            "label": "Container Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Name of the Container for uploading the files. Default is to create a container automatically.",
+            "visibleRule": "Destination = AzureBlob"
+        },
+        {
+            "name": "BlobPrefix",
+            "type": "string",
+            "label": "Blob Prefix",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Useful for filtering files, for example, append build number to all the blobs to download files from that build only.",
+            "visibleRule": "Destination = AzureBlob"
+        },
+        {
+            "name": "EnvironmentName",
+            "aliases": ["cloudService"],
+            "type": "pickList",
+            "label": "Cloud Service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Name of the target Cloud Service for copying files to.",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceName && Destination = AzureVMs"
+        },
+        {
+            "name": "EnvironmentNameRM",
+            "aliases": ["resourceGroup"],
+            "type": "pickList",
+            "label": "Resource Group",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Name of the target Resource Group for copying files to.",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM && Destination = AzureVMs"
+        },
+        {
+            "name": "ResourceFilteringMethod",
+            "type": "radio",
+            "label": "Select Machines By",
+            "required": false,
+            "defaultValue": "machineNames",
+            "options": {
+                "machineNames": "Machine Names",
+                "tags": "Tags"
+            },
+            "helpMarkDown": "Optionally, select a subset of VMs in resource group either by providing VMs host name or tags. [Tags](https://azure.microsoft.com/en-in/documentation/articles/virtual-machines-tagging-arm/) are supported for resources created via the Azure Resource Manager only.",
+            "visibleRule": "Destination = AzureVMs"
+        },
+        {
+            "name": "MachineNames",
+            "type": "string",
+            "label": "Filter Criteria",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Provide a list of VMs host name like ffweb, ffdb, or tags like Role:DB, Web; OS:Win8.1. Note the delimiters used for tags are &#44;(comma), &#58;(colon) and &#59;(semicolon). If multiple tags are provided, then the task will run in all the VMs with the specified tags. The default is to run the task in all the VMs.",
+            "visibleRule": "Destination = AzureVMs"
+        },
+        {
+            "name": "vmsAdminUserName",
+            "type": "string",
+            "label": "Admin Login",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Administrator Username of the VMs.",
+            "visibleRule": "Destination = AzureVMs"
+        },
+        {
+            "name": "vmsAdminPassword",
+            "type": "string",
+            "label": "Password",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Administrator Password of the VMs. <br>It can accept variable defined in Build/Release definitions as '$(passwordVariable)'. <br>You may mark variable type as 'secret' to secure it.",
+            "visibleRule": "Destination = AzureVMs"
+        },
+        {
+            "name": "TargetPath",
+            "type": "string",
+            "label": "Destination Folder",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Local path on the target machines for copying the files from the source. Environment variable can be used like $env:windir\\BudgetIT\\Web.",
+            "visibleRule": "Destination = AzureVMs"
+        },
+        {
+            "name": "AdditionalArguments",
+            "type": "multiLine",
+            "label": "Additional Arguments",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Additional AzCopy.exe arguments that will be applied when uploading to blob or uploading to VM like, /NC:10."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "StorageAccount",
+            "endpointId": "$(ConnectedServiceName)",
+            "dataSourceName": "AzureStorageServiceNames"
+        },
+        {
+            "target": "EnvironmentName",
+            "endpointId": "$(ConnectedServiceName)",
+            "dataSourceName": "AzureHostedServiceNames"
+        },
+        {
+            "target": "StorageAccountRM",
+            "endpointId": "$(ConnectedServiceNameARM)",
+            "dataSourceName": "AzureStorageAccountRM"
+        },
+        {
+            "target": "EnvironmentNameRM",
+            "endpointId": "$(ConnectedServiceNameARM)",
+            "dataSourceName": "AzureVirtualMachinesV2Id",
+            "resultTemplate": "{\"Value\":\"{{{ #extractResource resourceGroups}}}\",\"DisplayValue\":\"{{{ #extractResource resourceGroups}}}\"}"
+        }
+    ],
+    "instanceNameFormat": "$(Destination) File Copy",
+    "execution": {
+        "PowerShell3": {
+            "target": "AzureAgentCreate.ps1"
+        }
+    }
+}
