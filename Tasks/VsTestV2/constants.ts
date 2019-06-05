@@ -30,5 +30,6 @@ export module VsTestToolsInstaller {
 export module DistributionTypes {
     export const EXECUTIONTIMEBASED = 'TestExecutionTimes';
     export const ASSEMBLYBASED = 'TestAssemblies';
+    export const ASSEMBLYTIMEBASED = "TestAssembliesTime"
     export const NUMBEROFTESTMETHODSBASED = 'numberoftestmethods';
 }

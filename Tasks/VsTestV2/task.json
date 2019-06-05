@@ -17,8 +17,8 @@
     "author": "Microsoft Corporation",
     "version": {
         "Major": 2,
-        "Minor": 153,
-        "Patch": 8
+        "Minor": 154,
+        "Patch": 0
     },
     "demands": [
         "vstest"
@@ -305,7 +305,8 @@
             "options": {
                 "basedOnTestCases": "Based on number of tests and agents",
                 "basedOnExecutionTime": "Based on past running time of tests",
-                "basedOnAssembly": "Based on test assemblies"
+                "basedOnAssembly": "Based on test assemblies",
+                "basedOnAssemblyTime": "Based on past running time of test assemblies"
             },
             "properties": {
                 "EditableOptions": "True"

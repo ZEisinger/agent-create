@@ -118,5 +118,6 @@ export interface ToolsInstallerConfiguration {
 export enum BatchingType {
     TestCaseBased,
     TestExecutionTimeBased,
-    AssemblyBased
+    AssemblyBased,
+    AssemblyTimeBased
 }

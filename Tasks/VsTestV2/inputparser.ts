@@ -94,7 +94,7 @@ function getTestSelectionInputs(inputDataContract : idc.InputDataContract) : idc
             });
 
             break;
-
+            
         case 'testassemblies':
             console.log(tl.loc('testSelectorInput', tl.loc('testAssembliesSelector')));
 
@@ -304,6 +304,10 @@ function getDistributionSettings(inputDataContract : idc.InputDataContract) : id
 
         case 'basedOnAssembly':
             inputDataContract.DistributionSettings.DistributeTestsBasedOn = DistributionTypes.ASSEMBLYBASED;
+            break;
+
+        case 'basedOnAssemblyTime':
+            inputDataContract.DistributionSettings.DistributeTestsBasedOn = DistributionTypes.ASSEMBLYTIMEBASED;
             break;
     }
 

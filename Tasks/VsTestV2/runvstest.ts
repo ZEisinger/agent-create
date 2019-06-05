@@ -125,6 +125,8 @@ function isServerBasedRun(): boolean {
         return true;
     } else if (batchType && batchType === 'basedOnAssembly') {
         return true;
+    } else if (batchType && batchType === 'basedOnAssemblyTime') {
+        return true;
     }
 
     const testType = tl.getInput('testSelector');
